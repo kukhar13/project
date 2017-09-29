@@ -1,0 +1,172 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:component-scan base-package="proj"/>
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- Database Information -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url"
+                  value="jdbc:mysql://localhost:3306/mydb?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false"/>
+        <property name="username" value="root"/>
+        <property name="password" value="PASSWORD"/>
+    </bean>
+
+    <!-- Hibernate 4 SessionFactory Bean definition -->
+    <bean id="hibernate4AnnotatedSessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>proj.model.Question</value>
+                <value>proj.model.Result</value>
+                <value>proj.model.School</value>
+                <value>proj.model.Student</value>
+                <value>proj.model.Subject</value>
+                <value>proj.model.Teacher</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect
+                </prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--Transaction Manager bean-->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <!--CompanyDao and CompanyService beans-->
+    <bean id="subjectDao" class="proj.dao.SubjectDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+
+    <bean id="subjectService" class="proj.service.SubjectServiceImp">
+        <property name="subjectDao" ref="subjectDao"/>
+    </bean>
+    <tx:annotation-driven  />
+    <context:component-scan base-package="proj"/>
+
+
+    <bean id="schoolDao" class="proj.dao.SchoolDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <bean id="schoolService" class="proj.service.SchoolServiceImp">
+        <property name="schoolDao" ref="schoolDao"/>
+    </bean>
+    <tx:annotation-driven  />
+    <context:component-scan base-package="proj"/>
+
+
+    <bean id="questionDao" class="proj.dao.QuestionDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <bean id="questionService" class="proj.service.QuestionServiceImp">
+        <property name="questionDao" ref="questionDao"/>
+    </bean>
+    <tx:annotation-driven  />
+
+    <context:component-scan base-package="proj"/>
+
+
+
+    <bean id="resultDao" class="proj.dao.ResultDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <bean id="resultService" class="proj.service.ResultServiceImp">
+        <property name="resultDao" ref="resultDao"/>
+    </bean>
+    <tx:annotation-driven  />
+    <context:component-scan base-package="proj"/>
+
+
+    <bean id="studentDao" class="proj.dao.StudentDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <bean id="studentService" class="proj.service.StudentServiceImp">
+        <property name="studentDao" ref="studentDao"/>
+    </bean>
+    <tx:annotation-driven  />
+    <context:component-scan base-package="proj"/>
+
+
+
+    <bean id="teacherDao" class="proj.dao.TeacherDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"/>
+    </bean>
+
+    <bean id="teacherService" class="proj.service.TeacherServiceImp">
+        <property name="teacherDao" ref="teacherDao"/>
+    </bean>
+    <tx:annotation-driven  />
+
+
+    <!-- Resolves views selected for rendering by @Controllers to .jsp resources in the/WEB-INF/views directory —>
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-&lt;!&ndash;Custom Jackson mapper&ndash;&gt;-->
+    <!--<bean id="jacksonObjectMapper" class="lazy_track.service.MyJsonMapper"/>-->
+
+    <!--<mvc:annotation-driven>-->
+    <!--<mvc:message-converters>-->
+    <!--<bean class="org.springframework.http.converter.StringHttpMessageConverter">-->
+    <!--</bean>-->
+    <!--<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>-->
+    <!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">-->
+    <!--<property name="objectMapper" ref="jacksonObjectMapper"/>-->
+    <!--</bean>-->
+    <!--</mvc:message-converters>-->
+    <!--</mvc:annotation-driven>-->
+
+
+    <!--&lt;!&ndash; Configure to plugin JSON as request and response in method handler &ndash;&gt;-->
+    <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">-->
+    <!--<property name="messageConverters">-->
+    <!--<list>-->
+    <!--<ref bean="jsonMessageConverter"/>-->
+    <!--</list>-->
+    <!--</property>-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash; Configure bean to convert JSON to POJO and vice versa &ndash;&gt;-->
+    <!--<bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">-->
+    <!--</bean>-->
+
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper" ref="jacksonObjectMapper" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="jacksonObjectMapper" class="proj.service.MyJsonMapper" />
+</beans>
